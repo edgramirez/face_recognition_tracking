@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import platform
 import pickle
+import biblioteca as biblio
 
 # Set this depending on your camera type:
 # - True = Raspberry Pi 2.x camera module
@@ -18,7 +19,10 @@ pickle_file = 'train.pkl'
 
 
 #video_file = '/home/edgar/Downloads/La_cronica_del_triunfo_de_AMLO_el_1_de_julio_2018.mp4'
+video_file = '/home/edgar/Downloads/Halloween_obama.mp4'
 video_file = '/home/edgar/Downloads/The_Final_Minutes_of_President_Obamas_Farewell_Address_Yes_we_can.mp4'
+video_file = '/home/edgar/Downloads/Obama.mp4'
+video_file = '/home/edgar/Downloads/Prince_Harry_and_Michelle_Obama_surprise_students_in_Chicago.mp4'
 #video_file = 'Love_and_Happiness_An_Obama_Celebration.mp4'
 #video_file = 'Prince_Harry_and_Michelle_Obama_surprise_students_in_Chicago.mp4'
 
@@ -94,7 +98,7 @@ def lookup_known_face(face_encoding):
 
         # We'll also keep a total "seen count" that tracks how many times this person has come to the door.
         # But we can say that if we have seen this person within the last 5 minutes, it is still the same
-        # visit, not a new visit. But if they go away for awhile and come back, that is a new visit.
+        # visit, not a new visit. But if they go away for a while and come back, that is a new visit.
         if datetime.now() - metadata["first_seen_this_interaction"] > timedelta(minutes=5):
             metadata["first_seen_this_interaction"] = datetime.now()
             metadata["seen_count"] += 1
@@ -109,10 +113,14 @@ def mi_main():
         # Grab a single frame of video
         ret, frame = video_capture.read()
 
+        # if the frame was not grabbed, then we have reached the end of the stream
+        if not ret:
+            break
+
         # Resize frame of video to 1/4 size for faster face recognition processing
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
-        #compare_pickle_against_video(pickle_file, frame)
+        biblio.compare_pickle_against_video(pickle_file, frame)
 
     # Release handle to the webcam
     video_capture.release()
@@ -160,7 +168,7 @@ def main_loop():
     
                 # If this is a brand new face, add it to our list of known faces
                 else:
-                    face_label = "New visitor!"
+                    face_label = "desconocido"
     
                     # Grab the image of the the face from the current frame of video
                     top, right, bottom, left = face_location
@@ -229,5 +237,5 @@ def main_loop():
 
 if __name__ == "__main__":
     #load_known_faces()
-    mi_main()
-    #main_loop()
+    #mi_main()
+    main_loop()
