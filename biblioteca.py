@@ -17,18 +17,37 @@ def read_images_in_dir(path_to_read):
     images = [item for item in file_names if '.jpeg' in item[-5:] or '.jpg' in item[-4:] or 'png' in item[-4:] ]
     return images, dir_name
 
-def read_pickle(pickle_file):
-    with open(pickle_file, 'rb') as f:
-        Names = pickle.load(f)
-        Encodings = pickle.load(f)
-        return (Names, Encodings)
+
+def read_pickle(pickle_file, exception=True):
+    try:
+        with open(pickle_file, 'rb') as f:
+            Names = pickle.load(f)
+            Encodings = pickle.load(f)
+            return (Names, Encodings)
+    except OSError as e:
+        if exception:
+            log_error("Unable to open pickle_file: {}, original exception {}".format(pickle_file, str(e)))
+        else:
+            return False
+
 
 def write_to_pickle(Names, Encodings):
     with open('train.pkl','wb') as f:
         pickle.dump(Names, f)
         pickle.dump(Encodings, f)
 
-def compare_pickle_against_unknown(pickle_file, image_dir):
+
+def log_error(msg, quit=True):
+    print("-- PARAMETER ERROR --\n"*5)
+    print(" %s \n" % msg)
+    print("-- PARAMETER ERROR --\n"*5)
+    if quit:
+        quit()
+    else:
+        return False
+
+
+def compare_pickle_against_unknown(pickle_file, image_dir, video = True):
     names_encodings = read_pickle(pickle_file)
     Names = names_encodings[0]
     Encodings = names_encodings[1]
@@ -70,6 +89,7 @@ def compare_pickle_against_unknown(pickle_file, image_dir):
                 cv2.rectangle(test_image, (left, top),(right, bottom),(0, 0, 255), 2)
                 cv2.putText(test_image, face_title, (left, top-6), font, .75, (180, 51, 225), 2)
 
+        if not video:
             cv2.imshow('Imagen', test_image)
             cv2.moveWindow('Imagen', 0 ,0)
 
