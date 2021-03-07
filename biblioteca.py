@@ -47,7 +47,52 @@ def log_error(msg, quit=True):
         return False
 
 
-def compare_pickle_against_unknown(pickle_file, image_dir, video = True):
+def compare_pickle_against_video(pickle_file, frame):
+    names_encodings = read_pickle(pickle_file)
+    Names = names_encodings[0]
+    Encodings = names_encodings[1]
+
+    test_image = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+    # try to get the location of the face if there is one
+    face_locations = face_recognition.face_locations(test_image)
+
+    # if got a face, loads the image, else ignores it
+    if face_locations:
+        encoding_of_faces = face_recognition.face_encodings(test_image, face_locations)
+
+        for (top, right, bottom, left), face_encoding in zip(face_locations, encoding_of_faces):
+            face_title = 'desconocido'
+
+            # compare to get a list of matches only to see if it is interesing to check
+            matches = face_recognition.compare_faces(Encodings, face_encoding)
+
+            if True in matches:
+                # Calculate the face distance between the unknown face and every face on in our known face list
+                # This will return a floating point number between 0.0 and 1.0 for each known face. The smaller the number,
+                # the more similar that face was to the unknown face.
+                face_distances = face_recognition.face_distance(Encodings, face_encoding)
+
+                # Get the known face that had the lowest distance (i.e. most similar) from the unknown face.
+                best_match_index = np.argmin(face_distances)
+
+                # THIS IS NOT CORRECT BECAUSE NOT NECESARY THAT THE FIRT MATCH IS THE BEST ONE
+                #first_match_index = matches.index(True)
+                #print("first_match_index", first_match_index, '..........................................')
+                #face_title = Names[first_match_index]
+                face_title = Names[best_match_index]
+
+            cv2.rectangle(test_image, (left, top),(right, bottom),(0, 0, 255), 2)
+            cv2.putText(test_image, face_title, (left, top-6), font, .75, (180, 51, 225), 2)
+
+        cv2.imshow('Imagen', test_image)
+        cv2.moveWindow('Imagen', 0 ,0)
+
+        # Display the final frame of video with boxes drawn around each detected fames
+        cv2.imshow('Video', frame)
+
+
+def compare_pickle_against_unknown_images(pickle_file, image_dir):
     names_encodings = read_pickle(pickle_file)
     Names = names_encodings[0]
     Encodings = names_encodings[1]
@@ -89,7 +134,6 @@ def compare_pickle_against_unknown(pickle_file, image_dir, video = True):
                 cv2.rectangle(test_image, (left, top),(right, bottom),(0, 0, 255), 2)
                 cv2.putText(test_image, face_title, (left, top-6), font, .75, (180, 51, 225), 2)
 
-        if not video:
             cv2.imshow('Imagen', test_image)
             cv2.moveWindow('Imagen', 0 ,0)
 
@@ -98,6 +142,7 @@ def compare_pickle_against_unknown(pickle_file, image_dir, video = True):
         else:
             print("Image to search does not contains faces")
             print(file_path)
+
 
 def encode_known_faces(known_faces_path):
     files, root = read_images_in_dir(known_faces_path)
