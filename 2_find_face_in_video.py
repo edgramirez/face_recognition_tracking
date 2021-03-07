@@ -14,10 +14,11 @@ USING_RPI_CAMERA_MODULE = False
 # Our list of known face encodings and a matching list of metadata about each face.
 encodings_of_known_faces = []
 known_face_metadata = []
+pickle_file = 'train.pkl'
 
 
 #video_file = '/home/edgar/Downloads/La_cronica_del_triunfo_de_AMLO_el_1_de_julio_2018.mp4'
-video_file = 'The_Final_Minutes_of_President_Obamas_Farewell_Address_Yes_we_can.mp4'
+video_file = '/home/edgar/Downloads/The_Final_Minutes_of_President_Obamas_Farewell_Address_Yes_we_can.mp4'
 #video_file = 'Love_and_Happiness_An_Obama_Celebration.mp4'
 #video_file = 'Prince_Harry_and_Michelle_Obama_surprise_students_in_Chicago.mp4'
 
@@ -111,7 +112,7 @@ def mi_main():
         # Resize frame of video to 1/4 size for faster face recognition processing
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
-        compare_pickle_against_video(pickle_file, frame)
+        #compare_pickle_against_video(pickle_file, frame)
 
     # Release handle to the webcam
     video_capture.release()
@@ -227,5 +228,6 @@ def main_loop():
 
 
 if __name__ == "__main__":
-    load_known_faces()
-    main_loop()
+    #load_known_faces()
+    mi_main()
+    #main_loop()
