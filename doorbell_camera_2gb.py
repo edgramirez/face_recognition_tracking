@@ -18,7 +18,7 @@ visitor = 0
 
 
 def save_known_faces():
-    with open("known_faces.dat", "wb") as face_data_file:
+    with open("/tmp/known_faces.dat", "wb") as face_data_file:
         face_data = [known_face_encodings, known_face_metadata]
         pickle.dump(face_data, face_data_file)
         print("Known faces backed up to disk.")
@@ -28,7 +28,7 @@ def load_known_faces():
     global known_face_encodings, known_face_metadata
 
     try:
-        with open("known_faces.dat", "rb") as face_data_file:
+        with open("/tmp/known_faces.dat", "rb") as face_data_file:
             known_face_encodings, known_face_metadata = pickle.load(face_data_file)
             print("Known faces loaded from disk.")
             return len(known_face_encodings)

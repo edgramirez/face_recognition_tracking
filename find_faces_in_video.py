@@ -25,8 +25,9 @@ video_file = '/home/edgar/Downloads/The_Final_Minutes_of_President_Obamas_Farewe
 video_file = '/home/edgar/Downloads/Obama.mp4'
 video_file = 'videos/MV12FaceRecognition8.mp4'
 video_file = '/home/edgar/Downloads/Prince_Harry_and_Michelle_Obama_surprise_students_in_Chicago.mp4'
-video_file = 'videos/edgar.mp4'
 video_file = 'videos/deysi.mp4'
+video_file = 'videos/3.mp4'
+video_file = 'videos/edgar.mp4'
 #video_file = 'Love_and_Happiness_An_Obama_Celebration.mp4'
 #video_file = 'Prince_Harry_and_Michelle_Obama_surprise_students_in_Chicago.mp4'
 
@@ -69,6 +70,7 @@ def main_loop():
     # Accessing the camera with OpenCV on a laptop just requires passing in the number of the webcam (usually 0)
     # Note: You can pass in a filename instead if you want to process a video file instead of a live camera stream
     video_capture = cv2.VideoCapture(video_file)
+    #video_capture = cv2.VideoCapture('rtsp://192.168.128.6:9000/live')
     #video_capture = cv2.VideoCapture(0)
 
     # Track how long since we last saved a copy of our known faces to disk as a backup.
