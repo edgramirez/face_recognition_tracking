@@ -162,9 +162,10 @@ def encode_known_faces(known_faces_path, output_file):
 
         # if got a face, loads the image, else ignores it
         if face_location:
-            encoding = face_recognition.face_encodings(face_obj)[0]
-            known_face_encodings.append(encoding)
             names.append(name)
+            encoding = face_recognition.face_encodings(face_obj)[0]
+
+            known_face_encodings.append(encoding)
 
             # Grab the image of the the face from the current frame of video
             top, right, bottom, left = face_location[0]
