@@ -14,6 +14,13 @@ from datetime import datetime, timedelta
 font = cv2.FONT_HERSHEY_SIMPLEX
 #print(cv2.__version__)
 
+def file_exists(file_name):
+    try:
+        with open(file_name) as f:
+            return file_name
+    except OSError as e:
+        return False
+
 
 def read_images_in_dir(path_to_read):
     dir_name, subdir_name, file_names = next(walk(path_to_read))
@@ -33,10 +40,19 @@ def read_pickle(pickle_file, exception=True):
             return False
 
 
-def write_to_pickle(encodings_list, known_face_metadata, output_file):
-    with open(output_file,'wb') as f:
-        face_data = [encodings_list, known_face_metadata]
-        pickle.dump(face_data, f)
+def write_to_pickle(encodings_list, known_face_metadata, output_file, new_file = True):
+    if new_file and file_exists(output_file):
+        os.remove(output_file)
+        if file_exists(output_file):
+            raise Exception('unable to delete file: %s' % file_name)
+
+        with open(output_file,'wb') as f:
+            face_data = [encodings_list, known_face_metadata]
+            pickle.dump(face_data, f)
+    else:
+        with open(output_file,'ab') as f:
+            face_data = [encodings_list, known_face_metadata]
+            pickle.dump(face_data, f)
 
 
 def log_error(msg, _quit=True):
@@ -143,7 +159,7 @@ def compare_pickle_against_unknown_images(pickle_file, image_dir):
             print(file_path)
 
 
-def encode_known_faces(known_faces_path, output_file):
+def encode_known_faces(known_faces_path, output_file, new_file = True):
     files, root = read_images_in_dir(known_faces_path)
 
     names = []
@@ -172,11 +188,11 @@ def encode_known_faces(known_faces_path, output_file):
             face_image = face_obj[top:bottom, left:right]
             face_image = cv2.resize(face_image, (150, 150))
 
-            date = datetime.now(),
+            current_date = datetime.now()
             known_face_metadata.append({
-                "first_seen": date,
-                "first_seen_this_interaction": date,
-                "last_seen": date,
+                "first_seen": current_date,
+                "first_seen_this_interaction": current_date,
+                "last_seen": current_date,
                 "seen_count": 1,
                 "seen_frames": 1,
                 "name": name,
@@ -185,7 +201,7 @@ def encode_known_faces(known_faces_path, output_file):
 
     if names:
         print(names)
-        write_to_pickle(known_face_encodings, known_face_metadata, output_file)
+        write_to_pickle(known_face_encodings, known_face_metadata, output_file, new_file)
     else:
         print('Ningun archivo de imagen contine rostros')
 
