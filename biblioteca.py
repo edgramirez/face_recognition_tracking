@@ -31,13 +31,14 @@ def read_images_in_dir(path_to_read):
 def read_pickle(pickle_file, exception=True):
     try:
         with open(pickle_file, 'rb') as f:
-            encodings, known_face_metadata = pickle.load(f)
-            return encodings, known_face_metadata
+            known_face_encodings, known_face_metadata = pickle.load(f)
+            print("Total Known faces loaded from disk = {}".format(len(known_face_encodings)))
+            return len(known_face_metadata), known_face_encodings, known_face_metadata
     except OSError as e:
         if exception:
             log_error("Unable to open pickle_file: {}, original exception {}".format(pickle_file, str(e)))
         else:
-            return False
+            return 0, [], []
 
 
 def write_to_pickle(encodings_list, known_face_metadata, output_file, new_file = True):
@@ -65,8 +66,25 @@ def log_error(msg, _quit=True):
         return False
 
 
+def draw_box_around_face(face_locations, face_labels, image):
+    # Draw a box around each face and label each face
+    for (top, right, bottom, left), face_label in zip(face_locations, face_labels):
+        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+        top *= 4
+        right *= 4
+        bottom *= 4
+        left *= 4
+
+        # Draw a box around the face
+        cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
+
+        # Draw a label with a name below the face
+        cv2.rectangle(image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.putText(image, face_label, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
+
+
 def compare_pickle_against_video(pickle_file, frame):
-    known_face_encodings, known_face_metadata = read_pickle(pickle_file)
+    total_known_faces, known_face_encodings, known_face_metadata = read_pickle(pickle_file)
 
     test_image = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
@@ -109,7 +127,7 @@ def compare_pickle_against_video(pickle_file, frame):
 
 
 def compare_pickle_against_unknown_images(pickle_file, image_dir):
-    known_face_encodings, known_face_metadata = read_pickle(pickle_file)
+    total_known_faces, known_face_encodings, known_face_metadata = read_pickle(pickle_file)
 
     files, root = read_images_in_dir(image_dir)
     for file_name in files:

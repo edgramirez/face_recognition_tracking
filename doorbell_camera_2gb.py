@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import platform
 import pickle
+import biblioteca as biblio
 
 # Set this depending on your camera type:
 # - True = Raspberry Pi 2.x camera module
@@ -14,7 +15,6 @@ import pickle
 # Our list of known face encodings and a matching list of metadata about each face.
 #known_face_encodings = []
 #known_face_metadata = []
-#visitor = 0
 
 
 def save_known_faces(known_face_encodings, known_face_metadata):
@@ -113,32 +113,26 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata):
 
 
 def main_loop():
-    #global visitor
-    # Get access to the webcam. The method is different depending on if you are using a Raspberry Pi camera or USB input.
-    #if USING_RPI_CAMERA_MODULE:
-    #    # Accessing the camera with OpenCV on a Jetson Nano requires gstreamer with a custom gstreamer source string
-    #video_capture = cv2.VideoCapture(get_jetson_gstreamer_source(), cv2.CAP_GSTREAMER)
-    #else:
-    #    # Accessing the camera with OpenCV on a laptop just requires passing in the number of the webcam (usually 0)
-    #    # Note: You can pass in a filename instead if you want to process a video file instead of a live camera stream
     video_capture = cv2.VideoCapture("/home/edgar/Downloads/La_cronica_del_triunfo_de_AMLO_el_1_de_julio_2018.mp4")
-    #    #video_capture = cv2.VideoCapture(0)
 
     # Track how long since we last saved a copy of our known faces to disk as a backup.
     number_of_faces_since_save = 0
 
-    #load data from binary db 
-
-    visitor, known_face_encodings, known_face_metadata = load_known_faces()
+    #total_visitors, known_face_encodings, known_face_metadata = load_known_faces()
+    total_visitors, known_face_encodings, known_face_metadata = biblio.read_pickle("/tmp/known_faces.dat")
 
     frame_counter = 0
     while True:
         # Grab a single frame of video
         ret, frame = video_capture.read()
+
+        if not ret:
+            break
+
         frame_counter += 1
 
         # Process image every other frame to speed up
-        if frame_counter % 3 == 0: 
+        if frame_counter % 2 == 0: 
             continue
         
         # Resize frame of video to 1/4 size for faster face recognition processing
@@ -167,7 +161,7 @@ def main_loop():
                     face_label = f"{metadata['name']} {int(time_at_door.total_seconds())}s"
                 # If this is a brand new face, add it to our list of known faces
                 else:
-                    face_label = "New visitor" + str(visitor) + '!!'
+                    face_label = "New visitor" + str(total_visitors) + '!!'
     
                     # Grab the image of the the face from the current frame of video
                     top, right, bottom, left = face_location
@@ -175,16 +169,17 @@ def main_loop():
                     face_image = cv2.resize(face_image, (150, 150))
     
                     # Add the new face to our known faces metadata
-                    known_face_metadata = register_new_face(known_face_metadata, face_image, 'visitor' + str(visitor))
+                    known_face_metadata = register_new_face(known_face_metadata, face_image, 'visitor' + str(total_visitors))
 
                     # Add the face encoding to the list of known faces
                     known_face_encodings.append(face_encoding)
 
-                    visitor += 1
+                    total_visitors += 1
 
                 face_labels.append(face_label)
     
             # Draw a box around each face and label each face
+            #biblio.draw_box_around_face(face_locations, face_labels, frame)
             for (top, right, bottom, left), face_label in zip(face_locations, face_labels):
                 # Scale back up face locations since the frame we detected in was scaled to 1/4 size
                 top *= 4
