@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 import sys
-import biblioteca as biblio 
+import common as com
 
 param_length = len(sys.argv)
 
-msg = 'Usage: ' + sys.argv[0] + ' [\n  newdb /PATH/TO/IMAGE/FILES output /PATH/TO/OUTPUT_FILE \n  appenTo /PATH/TO/EXISTING_DB \n  find_images KNOWN_INPUT_DATA_FILE | read_video | find_video ]'
+msg = 'Usage: ' + sys.argv[0] + ' newDb | appendTo | findImg | readVideo '
 
-if param_length < 1:
-    biblio.log_error(msg)
+if param_length < 2:
+    com.log_error(msg)
 
 if sys.argv[1] == 'newDb':
     if param_length == 2:
@@ -17,10 +17,11 @@ if sys.argv[1] == 'newDb':
         known_faces = sys.argv[2]
         pickle_file = sys.argv[4]
     else:
-        biblio.log_error(msg)
+        com.log_error(msg)
 
-    biblio.encode_known_faces(known_faces, pickle_file)
-elif sys.argv[1] == 'appenTo':
+    import biblioteca as biblio 
+    biblio.encode_known_face(known_faces, pickle_file)
+elif sys.argv[1] == 'appendTo':
     if param_length == 2:
         known_faces = 'images/load'
         pickle_file = '/tmp/train.pkl'
@@ -28,9 +29,10 @@ elif sys.argv[1] == 'appenTo':
         known_faces = sys.argv[2]
         pickle_file = sys.argv[4]
     else:
-        biblio.log_error(msg)
+        com.log_error(msg)
 
-    biblio.encode_known_faces(known_faces, pickle_file, False)
+    import biblioteca as biblio 
+    biblio.encode_known_face(known_faces, pickle_file, False)
 elif sys.argv[1] == 'findImg':
     if param_length == 2:
         image_dir = 'images/find'
@@ -39,8 +41,9 @@ elif sys.argv[1] == 'findImg':
         image_dir = sys.argv[2]
         pickle_file = sys.argv[4]
     else:
-        biblio.log_error(msg)
+        com.log_error(msg)
 
+    import biblioteca as biblio 
     biblio.compare_pickle_against_unknown_images(pickle_file, image_dir)
 elif sys.argv[1] == 'readVideo':
     if param_length == 2:
@@ -50,8 +53,21 @@ elif sys.argv[1] == 'readVideo':
         image_dir = sys.argv[2]
         pickle_file = sys.argv[4]
     else:
-        biblio.log_error(msg)
+        com.log_error(msg)
 
+    import biblioteca as biblio 
     biblio.read_video(video_input, data_file)
+elif sys.argv[1] == 'compareData':
+    if param_length == 2:
+        video_data_file = '/tmp/known_faces.dat'
+        known_data_file = '/tmp/train.pkl'
+    elif param_length == 5 and sys.argv[3] == 'known_data':
+        image_dir = sys.argv[2]
+        pickle_file = sys.argv[4]
+    else:
+        com.log_error(msg)
+
+    import biblioteca as biblio 
+    biblio.compare_data(video_data_file, known_data_file)
 else:
-    biblio.log_error(msg)
+    com.log_error(msg)
