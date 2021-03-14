@@ -228,6 +228,24 @@ def encode_known_faces(known_faces_path, output_file, new_file = True):
         print('Ningun archivo de imagen contine rostros')
 
 
+def compare_data(data_file, known_faces_data):
+    # load data from binary db of all faces from video
+    total_visitors, video_face_encodings, video_faces_metadata = read_pickle(data_file)
+
+    # load data from binary db of known faces 
+    total_known_faces, known_face_encodings, known_face_metadata = read_pickle(known_faces_data)
+
+    # TODO   loop de rostros conocido en cada uno de los rostros detectados por el video
+    for video_face_encoding in video_face_encodings:
+        # See if this face is in our list of known faces.
+        metadata = lookup_known_face(video_face_encoding, known_face_encodings, known_face_metadata)
+
+        # If we found the face, label the face with some useful information.
+        if metadata:
+            time_at_door = datetime.now() - metadata['first_seen_this_interaction']
+            face_label = f"{metadata['name']} {int(time_at_door.total_seconds())}s"
+
+
 def read_video(video_input, data_file):
     video_capture = cv2.VideoCapture(video_input)
 
