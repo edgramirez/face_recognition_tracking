@@ -113,26 +113,6 @@ def lookup_known_face(face_encoding):
     return None
 
 
-def mi_main():
-    video_capture = cv2.VideoCapture(video_file)
-
-    while True:
-        # Grab a single frame of video
-        ret, frame = video_capture.read()
-
-        # if the frame was not grabbed, then we have reached the end of the stream
-        if not ret:
-            break
-
-        # Resize frame of video to 1/4 size for faster face recognition processing
-        small_frame = cv2.resize(frame, (0, 0), fx=0.15, fy=0.15)
-
-        biblio.compare_pickle_against_video(pickle_file, frame)
-
-    # Release handle to the webcam
-    video_capture.release()
-    cv2.destroyAllWindows()
-
 def main_loop():
     # Get access to the webcam. The method is different depending on if you are using a Raspberry Pi camera or USB input.
     # Accessing the camera with OpenCV on a laptop just requires passing in the number of the webcam (usually 0)
