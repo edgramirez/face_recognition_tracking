@@ -121,11 +121,9 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata):
     """
     See if this is a face we already have in our face list
     """
-    metadata = None
-
     # If our known face list is empty, just return nothing since we can't possibly have seen this face.
     if len(known_face_encodings) == 0:
-        return metadata
+        return None
 
     # Only check if there is a match
     matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
@@ -135,7 +133,6 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata):
         indexes = [ index for index, item in enumerate(matches) if item]
         only_true_known_face_encodings = [ known_face_encodings[ind] for ind in indexes ]
 
-        # edgar face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
         face_distances = face_recognition.face_distance(only_true_known_face_encodings, face_encoding)
         # Get the known face that had the lowest distance (i.e. most similar) from the unknown face.
         best_match_index = np.argmin(face_distances)
@@ -155,11 +152,12 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata):
 
             return metadata
 
-    return metadata
+    return None
 
 
 def compare_pickle_against_unknown_images(pickle_file, image_dir):
     total_known_faces, known_face_encodings, known_face_metadata = read_pickle(pickle_file)
+
     files, root = read_images_in_dir(image_dir)
     for file_name in files:
         file_path = os.path.join(root, file_name)
@@ -175,18 +173,9 @@ def compare_pickle_against_unknown_images(pickle_file, image_dir):
 
             for (top, right, bottom, left), face_encoding in zip(face_locations, encoding_of_faces):
                 face_title = 'desconocido'
-
-                # compare to get a list of matches only to see if it is interesing to check
-                matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-
-                if True in matches:
-                    # Calculate the face distance between the unknown face and every face on in our known face list This will return a floating point
-                    # number between 0.0 and 1.0 for each known face. The smaller the number, the more similar that face was to the unknown face.
-                    face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-
-                    # Get the known face that had the lowest distance (i.e. most similar) from the unknown face.
-                    best_match_index = np.argmin(face_distances)
-                    face_title = known_face_metadata[best_match_index]['name']
+                metadata = lookup_known_face(face_encoding, known_face_encodings, known_face_metadata)
+                if metadata:
+                    face_title = metadata['name']
 
                 cv2.rectangle(test_image, (left, top),(right, bottom),(0, 0, 255), 2)
                 cv2.putText(test_image, face_title, (left, top-6), font, .75, (180, 51, 225), 2)

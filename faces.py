@@ -35,8 +35,8 @@ elif sys.argv[1] == 'find_images':
     if param_length == 2:
         image_dir = 'images/find'
         pickle_file = '/tmp/train.pkl'
-    elif param_length == 4 and sys.argv[3] == 'output':
-        pickle_file = sys.argv[2]
+    elif param_length == 5 and sys.argv[3] == 'input':
+        image_dir = sys.argv[2]
         pickle_file = sys.argv[4]
     else:
         biblio.log_error(msg)
