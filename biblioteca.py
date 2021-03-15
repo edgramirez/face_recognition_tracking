@@ -105,7 +105,6 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata, 
     # Only check if there is a match
     matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
 
-    #if any(matches):
     if True in matches:
         # If there is a match, then get the best distances only on the index with "True" to ignore the process on those that are False
         indexes = [ index for index, item in enumerate(matches) if item]
@@ -133,7 +132,7 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata, 
     return None
 
 
-def encode_known_face(known_faces_path, output_file, new_file = True):
+def encode_known_faces(known_faces_path, output_file, new_file = True):
     files, root = com.read_images_in_dir(known_faces_path)
 
     names = []
@@ -149,13 +148,10 @@ def encode_known_face(known_faces_path, output_file, new_file = True):
 
         # if got a face, loads the image, else ignores it
         if face_location:
-            encoding = face_recognition.face_encodings(face_obj)
-
-            if len(encoding) > 1:
-                com.log_error('encode_known_face() - is meant to process only one face at a time')
-
             name = os.path.splitext(file_name)[0]
             names.append(name)
+            encoding = face_recognition.face_encodings(face_obj)[0]
+
             known_face_encodings.append(encoding)
 
             # Grab the image of the the face from the current frame of video
@@ -218,13 +214,14 @@ def compare_data(data_file, known_faces_data):
 
         if metadata:
             print('Face {} detected at {}'.format(
-                metadata['name'], 
-                video_metadata['first_seen'], 
-                video_metadata['first_seen_this_interaction'], 
-                video_metadata['last_seen'], 
-                video_metadata['seen_count'], 
+                metadata['name'],
+                video_metadata['first_seen'],
+                video_metadata['first_seen_this_interaction'],
+                video_metadata['last_seen'],
+                video_metadata['seen_count'],
                 video_metadata['seen_frames']
                 ))
+
 
 def read_video(video_input, data_file):
     video_capture = cv2.VideoCapture(video_input)

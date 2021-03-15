@@ -20,7 +20,7 @@ if sys.argv[1] == 'newDb':
         com.log_error(msg)
 
     import biblioteca as biblio 
-    biblio.encode_known_face(known_faces, pickle_file)
+    biblio.encode_known_faces(known_faces, pickle_file)
 elif sys.argv[1] == 'appendTo':
     if param_length == 2:
         known_faces = 'images/load'
@@ -32,7 +32,7 @@ elif sys.argv[1] == 'appendTo':
         com.log_error(msg)
 
     import biblioteca as biblio 
-    biblio.encode_known_face(known_faces, pickle_file, False)
+    biblio.encode_known_faces(known_faces, pickle_file, False)
 elif sys.argv[1] == 'findImg':
     if param_length == 2:
         image_dir = 'images/find'
@@ -67,7 +67,7 @@ elif sys.argv[1] == 'compareData':
     else:
         com.log_error(msg)
 
-    import biblioteca as biblio 
+    import biblioteca as biblio
     biblio.compare_data(video_data_file, known_data_file)
 else:
     com.log_error(msg)
