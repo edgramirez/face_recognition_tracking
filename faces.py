@@ -4,7 +4,7 @@ import common as com
 
 param_length = len(sys.argv)
 
-msg = 'Usage: ' + sys.argv[0] + ' newDb | appendTo | findImg | readVideo '
+msg = 'Usage: ' + sys.argv[0] + ' newDb | findImg | readVideo | findVideo | appendTo | compareData | findSilence'
 
 if param_length < 2:
     com.log_error(msg)
@@ -56,6 +56,22 @@ elif sys.argv[1] == 'readVideo':
         com.log_error(msg)
 
     import biblioteca as biblio 
+    biblio.read_video(video_input, data_file)
+elif sys.argv[1] == 'findVideo':
+    if param_length == 2:
+        video_input = '/tmp/video/test_video.mp4'
+        data_file = '/tmp/train.pkl'
+        known_faces = 'images/load'
+        pickle_file = '/tmp/train.pkl'
+        import biblioteca as biblio
+        biblio.encode_known_faces(known_faces, pickle_file)
+    elif param_length == 5 and sys.argv[3] == 'known_data':
+        image_dir = sys.argv[2]
+        pickle_file = sys.argv[4]
+    else:
+        com.log_error(msg)
+
+    import biblioteca as biblio
     biblio.read_video(video_input, data_file)
 elif sys.argv[1] == 'compareData':
     if param_length == 2:
