@@ -143,21 +143,24 @@ def encode_known_faces(known_faces_path, output_file, new_file = True):
         # load the image into face_recognition library
         face_obj = face_recognition.load_image_file(root + '/' + file_name)
 
+        # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+        rgb_small_frame = face_obj[:, :, ::-1]
+
         # try to get the location of the face if there is one
-        face_location = face_recognition.face_locations(face_obj)
+        face_location = face_recognition.face_locations(rgb_small_frame)
 
         # if got a face, loads the image, else ignores it
         if face_location:
             name = os.path.splitext(file_name)[0]
             names.append(name)
-            encoding = face_recognition.face_encodings(face_obj)[0]
 
-            known_face_encodings.append(encoding)
-
-            # Grab the image of the the face from the current frame of video
+            # Grab the image of the face from the current frame of video
             top, right, bottom, left = face_location[0]
-            face_image = face_obj[top:bottom, left:right]
+            face_image = rgb_small_frame[top:bottom, left:right]
             face_image = cv2.resize(face_image, (150, 150))
+
+            encoding = face_recognition.face_encodings(face_image)[0]
+            known_face_encodings.append(encoding)
 
             new_known_face_metadata = register_new_face(known_face_metadata, face_image, name)
     if names:
