@@ -223,7 +223,7 @@ def compare_data(data_file, known_faces_data):
                 ))
 
 
-def read_video(video_input, data_file):
+def read_video(video_input, data_file, find = False):
     video_capture = cv2.VideoCapture(video_input)
 
     # Track how long since we last saved a copy of our known faces to disk as a backup.
@@ -266,30 +266,34 @@ def read_video(video_input, data_file):
                 # See if this face is in our list of known faces.
                 metadata = lookup_known_face(face_encoding, known_face_encodings, known_face_metadata)
 
+                face_label = None
                 # If we found the face, label the face with some useful information.
                 if metadata:
                     time_at_door = datetime.now() - metadata['first_seen_this_interaction']
                     face_label = f"{metadata['name']} {int(time_at_door.total_seconds())}s"
                 # If this is a brand new face, add it to our list of known faces
                 else:
-                    face_label = "New visitor" + str(total_visitors) + '!!'
-                    total_visitors += 1
+                    if not find:
+                        face_label = "New visitor" + str(total_visitors) + '!!'
+                        total_visitors += 1
 
-                    # Grab the image of the the face from the current frame of video
-                    top, right, bottom, left = face_location
-                    face_image = small_frame[top:bottom, left:right]
-                    face_image = cv2.resize(face_image, (150, 150))
+                        # Grab the image of the the face from the current frame of video
+                        top, right, bottom, left = face_location
+                        face_image = small_frame[top:bottom, left:right]
+                        face_image = cv2.resize(face_image, (150, 150))
 
-                    # Add the new face to our known faces metadata
-                    known_face_metadata = register_new_face(known_face_metadata, face_image, 'visitor' + str(total_visitors))
+                        # Add the new face to our known faces metadata
+                        known_face_metadata = register_new_face(known_face_metadata, face_image, 'visitor' + str(total_visitors))
 
-                    # Add the face encoding to the list of known faces
-                    known_face_encodings.append(face_encoding)
-
-                face_labels.append(face_label)
+                        # Add the face encoding to the list of known faces
+                        known_face_encodings.append(face_encoding)
+                
+                if face_label is not None:
+                    face_labels.append(face_label)
 
             # Draw a box around each face and label each face
-            draw_box_around_face(face_locations, face_labels, frame)
+            if face_label is not None:
+                draw_box_around_face(face_locations, face_labels, frame)
 
             # Display recent visitor images
             display_recent_visitors_face(known_face_metadata, frame)

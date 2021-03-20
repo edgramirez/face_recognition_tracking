@@ -61,8 +61,6 @@ elif sys.argv[1] == 'findVideo':
     if param_length == 2:
         video_input = 'video/test_video.mp4'
         data_file = 'known_faces/knowFaces.dat'
-        biblio.read_video(video_input, data_file)
-        quit()
     elif param_length == 5 and sys.argv[3] == 'known_data':
         image_dir = sys.argv[2]
         pickle_file = sys.argv[4]
@@ -70,7 +68,7 @@ elif sys.argv[1] == 'findVideo':
         com.log_error(msg)
 
     import biblioteca as biblio
-    biblio.read_video(video_input, data_file)
+    biblio.read_video(video_input, data_file, True)
 elif sys.argv[1] == 'compareData':
     if param_length == 2:
         video_data_file = 'encoded_videos/test_video_default.data'
