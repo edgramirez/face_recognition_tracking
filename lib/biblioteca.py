@@ -226,8 +226,10 @@ def compare_data(data_file, known_faces_data):
                 ))
 
 
-def read_video(video_input, data_file, find = False):
+def read_video(video_input, data_file, **kwargs):
     video_capture = cv2.VideoCapture(video_input)
+    find =  kwargs.get('find', False)
+    silence =  kwargs.get('silence', False)
 
     # Track how long since we last saved a copy of our known faces to disk as a backup.
     number_of_faces_since_save = 0
@@ -302,10 +304,11 @@ def read_video(video_input, data_file, find = False):
             display_recent_visitors_face(known_face_metadata, frame)
 
         # Display the final frame of video with boxes drawn around each detected fames
-        cv2.imshow('Video', frame)
+        if not silence:
+            cv2.imshow('Video', frame)
 
         # Hit 'q' on the keyboard to quit!
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if not silence and cv2.waitKey(1) & 0xFF == ord('q'):
             if not find:
                 write_to_pickle(known_face_encodings, known_face_metadata, data_file)
             break
