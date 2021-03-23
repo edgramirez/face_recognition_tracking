@@ -56,7 +56,8 @@ elif sys.argv[1] == 'readVideo':
         com.log_error(msg)
 
     import lib.biblioteca as biblio 
-    biblio.read_video(video_input, data_file)
+    kwargs = {}
+    biblio.read_video(video_input, data_file, **kwargs)
 elif sys.argv[1] == 'readSilence':
     if param_length == 2:
         video_input = 'data/video/test_video.mp4'
@@ -81,7 +82,8 @@ elif sys.argv[1] == 'findVideo':
         com.log_error(msg)
 
     import lib.biblioteca as biblio
-    biblio.read_video(video_input, data_file, True)
+    kwargs = {'find': True}
+    biblio.read_video(video_input, data_file, **kwargs)
 elif sys.argv[1] == 'compareData':
     if param_length == 2:
         video_data_file = 'data/video_encoded_faces/test_video_default.data'
