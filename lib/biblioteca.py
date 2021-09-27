@@ -65,14 +65,17 @@ def register_new_face(known_face_metadata, face_image, name):
     # Add a matching dictionary entry to our metadata list.
     # We can use this to keep track of how many times a person has visited, when we last saw them, etc.
     today_now = datetime.now()
+
     known_face_metadata.append({
-        "first_seen": today_now,
-        "first_seen_this_interaction": today_now,
-        "last_seen": today_now,
-        "seen_count": 1,
-        "seen_frames": 1,
-        "name": name,
-        "face_image": face_image,
+        'name': name,
+        'face_id': face_id,
+        'first_seen': today_now,
+        'first_seen_this_interaction': today_now,
+        'face_image': face_image,
+        'confidence': confidence,
+        'last_seen': today_now,
+        'seen_count': 1,
+        'seen_frames': 1
     })
 
     return known_face_metadata
@@ -103,6 +106,11 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata, 
         return None
 
     # Only check if there is a match
+    print(type(known_face_encodings))
+    print(type(face_encoding),'\n')
+    print(known_face_encodings,'\n')
+    print(face_encoding)
+    quit()
     matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
 
     if True in matches:
@@ -132,8 +140,8 @@ def lookup_known_face(face_encoding, known_face_encodings, known_face_metadata, 
     return None
 
 
-def encode_known_faces(known_faces_path, output_file, new_file = True):
-    files, root = com.read_images_in_dir(known_faces_path)
+def encode_known_faces(image_path, output_file, new_file = True):
+    files, root = com.read_images_in_dir(image_path)
 
     names = []
     known_face_encodings = []
@@ -167,7 +175,7 @@ def encode_known_faces(known_faces_path, output_file, new_file = True):
         print(names)
         write_to_pickle(known_face_encodings, new_known_face_metadata, output_file, new_file)
     else:
-        print('Ningun archivo de imagen contine rostros')
+        print('Ningun archivo de imagen contine rostros..{}'.format(files))
 
 
 def compare_pickle_against_unknown_images(pickle_file, image_dir):

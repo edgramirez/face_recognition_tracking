@@ -4,12 +4,12 @@ import lib.common as com
 
 param_length = len(sys.argv)
 
-msg = 'Usage: ' + sys.argv[0] + ' captureFaces | readVideo | readSilence | findImg | findVideo | compareData | appendTo'
+msg = 'Usage: ' + sys.argv[0] + ' loadFaces | readVideo | readSilence | findImg | findVideo | compareData | appendTo'
 
 if param_length < 2:
     com.log_error(msg)
 
-if sys.argv[1] == 'captureFaces':
+if sys.argv[1] == 'loadFaces':
     if param_length == 2:
         known_faces = 'data/load'
         data_file = 'data/encoded_known_faces/knowFaces.dat'
